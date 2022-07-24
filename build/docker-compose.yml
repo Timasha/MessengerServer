@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+  authService:
+    build: 
+      context: ./../
+      dockerfile: build/authService/Dockerfile
+    image: authservice
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    entrypoint: [./main]
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: logger
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
+    ports:
+      - '5433:5432'
+    volumes: 
+      - /var/lib/postgresql/data/:/var/lib/postgresql/data/
