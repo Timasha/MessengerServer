@@ -5,19 +5,20 @@ services:
       context: ./../
       dockerfile: build/authService/Dockerfile
     image: authservice
+    restart: always
     ports:
       - '8080:8080'
     depends_on:
       - db
     entrypoint: [./main]
   db:
-    image: postgres:latest
+    image: postgres:14
     restart: always
     environment:
-      POSTGRES_DB: logger
-      POSTGRES_USER: 
-      POSTGRES_PASSWORD: 
+      POSTGRES_DB: messenger
+      POSTGRES_USER: timofey
+      POSTGRES_PASSWORD: nbvjatq
     ports:
       - '5433:5432'
     volumes: 
-      - /var/lib/postgresql/data/:/var/lib/postgresql/data/
+      - /database_data:/var/lib/postgresql/data/

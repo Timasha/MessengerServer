@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS users(
     login text PRIMARY KEY,
-    password text
+    password text,
+    refreshBodies text[]
 );

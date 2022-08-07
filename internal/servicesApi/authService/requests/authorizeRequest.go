@@ -1,6 +1,6 @@
-package database
+package requests
 
-type User struct {
+type AuthorizeRequest struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }

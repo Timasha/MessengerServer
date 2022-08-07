@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"logger/internal/authService/api"
-	"logger/internal/authService/config"
-	"logger/internal/authService/database"
+	"messengerServer/internal/services/authService/api"
+	"messengerServer/internal/services/authService/config"
+	"messengerServer/internal/services/authService/database"
 )
 
 func main() {
@@ -16,6 +16,7 @@ func main() {
 	if connErr != nil {
 		log.Fatalf("Cant connect db error: %v", connErr)
 	}
+	defer database.Close()
 	database.SetRepository(db)
 	migrErr := database.Migrate("AUTHSERVICE_PATH_MIGRATIONS")
 	if migrErr != nil {

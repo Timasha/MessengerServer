@@ -10,8 +10,9 @@ import (
 type AuthServiceConfig struct {
 	Port string `json:"port"` // Порт для сервера
 
-	JwtKey      string `json:"jwtKey"`      // Ключ для шифрования токенов авторизации
-	JWTLifetime int64  `json:"jwtLifeTime"` // Время жизни токена авторизации
+	JwtKey          string `json:"jwtKey"`      // Ключ для шифрования токенов авторизации
+	JWTLifetime     int64  `json:"jwtLifetime"` // Время жизни токена авторизации
+	RefreshLifetime int64  `json:"refreshLifetime"`
 
 	DbLogin    string `json:"dbLogin"`    // Логин для авторизации в базе данных
 	DbPassword string `json:"dbPassword"` // Пароль для авторизации в базе данных
