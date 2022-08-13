@@ -2,19 +2,19 @@ package handlers
 
 import (
 	"encoding/json"
-	"messengerServer/internal/services/authService/config"
-	"messengerServer/internal/services/authService/database"
-	"messengerServer/internal/services/authService/token"
-	"messengerServer/internal/services/authService/webUtils"
-	"messengerServer/internal/servicesApi/authService/requests"
-	"messengerServer/internal/servicesApi/authService/responses"
+	"messengerServer/internal/api_objects/authorization/requests"
+	"messengerServer/internal/api_objects/authorization/responses"
+	"messengerServer/internal/services/authorization/config"
+	"messengerServer/internal/services/authorization/database"
+	"messengerServer/internal/services/authorization/token"
+	"messengerServer/internal/services/authorization/webUtils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v4"
 )
 
-func RegistrationHandler(conf config.AuthServiceConfig) func(c *fiber.Ctx) error {
+func RegistrationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		var resp responses.RegistrationResponse
 

@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"messengerServer/internal/services/authService/api"
-	"messengerServer/internal/services/authService/config"
-	"messengerServer/internal/services/authService/database"
+	"messengerServer/internal/services/authorization/api"
+	"messengerServer/internal/services/authorization/config"
+	"messengerServer/internal/services/authorization/database"
 )
 
 func main() {

@@ -1,16 +1,16 @@
 package handlers
 
 import (
-	"messengerServer/internal/services/authService/config"
-	"messengerServer/internal/services/authService/token"
-	"messengerServer/internal/services/authService/webUtils"
-	"messengerServer/internal/servicesApi/authService/responses"
+	"messengerServer/internal/api_objects/authorization/responses"
+	"messengerServer/internal/services/authorization/config"
+	"messengerServer/internal/services/authorization/token"
+	"messengerServer/internal/services/authorization/webUtils"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func CheckTokenHandler(conf config.AuthServiceConfig) func(c *fiber.Ctx) error {
+func CheckTokenHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 
 		var resp responses.CheckTokenResponse

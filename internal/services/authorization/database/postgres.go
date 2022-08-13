@@ -3,9 +3,8 @@ package database
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io/ioutil"
-	"messengerServer/internal/services/authService/config"
+	"messengerServer/internal/services/authorization/config"
 	"os"
 	"strings"
 	"time"
@@ -91,27 +90,20 @@ func (db DB) UpdateUser(login string, user User) (int64, error) {
 
 	var sqlChanges []string
 	if user.Login != "" {
-		sqlChanges = append(sqlChanges, "n1")
+		sqlChanges = append(sqlChanges, "SET login = $1")
 	}
 	if user.Password != "" {
-		sqlChanges = append(sqlChanges, "n2")
+		sqlChanges = append(sqlChanges, "SET password = $2")
 	}
 	if user.RefreshBodies != nil {
-		sqlChanges = append(sqlChanges, "n3")
+		sqlChanges = append(sqlChanges, "SET refreshBodies = $3")
 	}
-	sql := fmt.Sprint(sqlChanges)
-	sql = strings.ReplaceAll(sql[1:len(sql)-1], " ", ",")
-
-	sql = strings.Replace(sql, "n1", "SET login = $1", 1)
-	sql = strings.Replace(sql, "n2", "SET password = $2", 1)
-	sql = strings.Replace(sql, "n3", "SET replaceBodies = $3", 1)
-
-	sql = "UPDATE users " + sql + " WHERE login = $4"
+	sql := "UPDATE users " + strings.Join(sqlChanges, ",") + " WHERE login = $4"
 
 	cmdTag, err := db.Conn.Exec(context.Background(), sql, user.Login, user.Password, user.RefreshBodies, login)
 	return cmdTag.RowsAffected(), err
 }
-func (db DB) AddRefresh(login, refreshBody string) (int64, error) {
+func (db DB) AddRefreshBody(login, refreshBody string) (int64, error) {
 	cmdTag, err := db.Conn.Exec(context.Background(), "UPDATE users SET refreshBodies = array_append(refreshBodies, $1) WHERE login = $2", refreshBody, login)
 	return cmdTag.RowsAffected(), err
 }

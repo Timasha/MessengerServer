@@ -7,7 +7,7 @@ ARG cert_location=/usr/local/share/ca-certificates
 WORKDIR /build
 COPY . .
 RUN go mod download
-RUN go build ./cmd/authService/main.go
+RUN go build ./cmd/services/authorization/main.go
 
 WORKDIR /service
 

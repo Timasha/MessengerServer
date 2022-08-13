@@ -1,8 +1,8 @@
 {
 	"port":"8080",
 	"jwtKey":"",
-	"dbLogin":"",
-	"dbPassword":"",
+	"dbLogin":"timofey",
+	"dbPassword":"nbvjatq",
 	"dbIp":"db",
 	"dbPort":"5432"
 }

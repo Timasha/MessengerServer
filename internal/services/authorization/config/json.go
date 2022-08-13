@@ -23,7 +23,7 @@ type AuthServiceConfig struct {
 }
 
 func ReadConfig(pathKey string) (AuthServiceConfig, error) {
-	a := AuthServiceConfig{}
+	var authServiceConfig AuthServiceConfig
 	path := os.Getenv(pathKey)
 	if path == "" {
 		return AuthServiceConfig{}, errors.New("cannot find service config path or it's empty")
@@ -36,9 +36,9 @@ func ReadConfig(pathKey string) (AuthServiceConfig, error) {
 	if readErr != nil {
 		return AuthServiceConfig{}, readErr
 	}
-	unmarshErr := json.Unmarshal(data, &a)
+	unmarshErr := json.Unmarshal(data, &authServiceConfig)
 	if unmarshErr != nil {
 		return AuthServiceConfig{}, unmarshErr
 	}
-	return a, nil
+	return authServiceConfig, nil
 }

@@ -6,7 +6,7 @@ type Repository interface {
 	GetUser(string) (User, error)
 	CreateUser(User) (int64, error)
 	UpdateUser(string, User) (int64, error)
-	AddRefresh(string, string) (int64, error)
+	AddRefreshBody(string, string) (int64, error)
 }
 
 var impl Repository
@@ -31,6 +31,6 @@ func CreateUser(user User) (int64, error) {
 func UpdateUser(login string, user User) (int64, error) {
 	return impl.UpdateUser(login, user)
 }
-func AddRefresh(login, refreshBody string) (int64, error) {
-	return impl.AddRefresh(login, refreshBody)
+func AddRefreshBody(login, refreshBody string) (int64, error) {
+	return impl.AddRefreshBody(login, refreshBody)
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"messengerServer/internal/services/authService/api"
-	"messengerServer/internal/services/authService/config"
+	"messengerServer/internal/services/logger/api"
+	"messengerServer/internal/services/logger/config"
 )
 
 func main() {

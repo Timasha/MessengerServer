@@ -1,7 +1,7 @@
 package api
 
 import (
-	"messengerServer/internal/services/loggerService/config"
+	"messengerServer/internal/services/logger/config"
 
 	"github.com/gofiber/fiber/v2"
 )

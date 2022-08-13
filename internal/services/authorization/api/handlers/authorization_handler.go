@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"messengerServer/internal/services/authService/config"
-	"messengerServer/internal/services/authService/database"
-	"messengerServer/internal/services/authService/token"
-	"messengerServer/internal/services/authService/webUtils"
-	"messengerServer/internal/servicesApi/authService/requests"
-	"messengerServer/internal/servicesApi/authService/responses"
+	"messengerServer/internal/api_objects/authorization/requests"
+	"messengerServer/internal/api_objects/authorization/responses"
+	"messengerServer/internal/services/authorization/config"
+	"messengerServer/internal/services/authorization/database"
+	"messengerServer/internal/services/authorization/token"
+	"messengerServer/internal/services/authorization/webUtils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -30,12 +30,6 @@ func AuthorizationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error 
 			return nil
 		}
 
-		// Результаты запроса пользователя из базы данных
-		var (
-			dbUser     database.User
-			getUserErr error
-		)
-
 		// Подготовка данных запроса для обработки
 		var (
 			req        requests.AuthorizeRequest
@@ -53,6 +47,12 @@ func AuthorizationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error 
 			return nil
 		}
 
+		// Результаты запроса пользователя из базы данных
+		var (
+			dbUser     database.User
+			getUserErr error
+		)
+
 		dbUser, getUserErr = database.GetUser(req.Login)
 
 		if getUserErr == pgx.ErrNoRows { // Проверка на наличие пользователя
@@ -69,8 +69,8 @@ func AuthorizationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error 
 			return nil
 		}
 
-		accessToken, tokenGenErr := token.GenerateAccessToken(req.Login, conf.JwtKey, time.Duration(conf.JWTLifetime))
-		if tokenGenErr != nil {
+		accessToken, accessGenErr := token.GenerateAccessToken(req.Login, conf.JwtKey, time.Duration(conf.JWTLifetime))
+		if accessGenErr != nil {
 			resp.Err = "access token generation internal error"
 			webUtils.WriteResponse(resp, 500, c)
 			return nil
@@ -81,7 +81,7 @@ func AuthorizationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error 
 			webUtils.WriteResponse(resp, 500, c)
 			return nil
 		}
-		_, addRefreshErr := database.AddRefresh(req.Login, refresh[4:len(refresh)-6])
+		_, addRefreshErr := database.AddRefreshBody(req.Login, refresh[4:len(refresh)-6])
 		if addRefreshErr != nil {
 			resp.Err = "cannot add refresh to database"
 			webUtils.WriteResponse(resp, 500, c)
