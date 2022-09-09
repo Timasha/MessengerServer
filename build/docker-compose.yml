@@ -6,18 +6,21 @@ services:
       dockerfile: build/authService/Dockerfile
     image: authservice
     restart: always
+    environment:
+      AUTHSERVICE_PATH_CONFIG: /configs/authServiceConfig.json
+      AUTHSERVICE_PATH_MIGRATIONS: /migrations/
+      AUTHSERVICE_PATH_TLS: /tls/
     ports:
       - '8080:8080'
     depends_on:
       - db
-    entrypoint: [./main]
   db:
     image: postgres:14
     restart: always
     environment:
       POSTGRES_DB: messenger
-      POSTGRES_USER: timofey
-      POSTGRES_PASSWORD: nbvjatq
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
     ports:
       - '5433:5432'
     volumes: 

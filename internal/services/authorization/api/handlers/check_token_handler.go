@@ -31,7 +31,7 @@ func CheckTokenHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 
 		if len(parts) != 2 && parts[0] != "Bearer" {
 			resp.Err = "wrong header pattern"
-			webUtils.WriteResponse(resp, 400, c)
+			webUtils.WriteResponse(resp, 401, c)
 			return nil
 		}
 
@@ -41,12 +41,12 @@ func CheckTokenHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 
 		if parseErr != nil {
 			resp.Err = parseErr.Error()
-			webUtils.WriteResponse(resp, 400, c)
+			webUtils.WriteResponse(resp, 401, c)
 			return nil
 		}
 		if len([]byte(login)) < 5 {
 			resp.Err = "login length lower than 5"
-			webUtils.WriteResponse(resp, 400, c)
+			webUtils.WriteResponse(resp, 401, c)
 			return nil
 		}
 		resp.Login = login

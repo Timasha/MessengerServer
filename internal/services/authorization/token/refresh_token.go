@@ -89,6 +89,7 @@ func generateRefreshBody(resultChan chan string, bodyLen int) {
 		refreshBody[i] = bodyChars[newRand.Intn(62)]
 	}
 	resultChan <- string(refreshBody)
+
 }
 func GenerateRefreshToken(access string, refreshLifeTime int64) (string, error) {
 	accessByte := []byte(access)
@@ -98,30 +99,42 @@ func GenerateRefreshToken(access string, refreshLifeTime int64) (string, error) 
 
 	bodyChan := make(chan string, 1)
 	lifeTimeChan := make(chan string, 1)
+
 	defer close(bodyChan)
 	defer close(lifeTimeChan)
 
 	go generateRefreshBody(bodyChan, 8)
 	go timeToASCII(lifeTimeChan, time.Now().Add(time.Hour*time.Duration(refreshLifeTime)))
 
-	return <-lifeTimeChan + <-(bodyChan) + string(accessByte[len(accessByte)-6:]), nil
+	var resultToken string = <-lifeTimeChan + <-(bodyChan) + access[len(accessByte)-6:]
+
+	return resultToken, nil
 }
 
-func ValidRefreshToken(refresh, access, refreshBody string) error {
+func ValidRefreshToken(refresh, access string, refreshBodies []string) (int, error) {
 	if len(refresh) != 18 {
-		return errors.New("invalid token length")
+		return -1, errors.New("invalid token length")
 	}
 	expChan := make(chan time.Time, 1)
 	defer close(expChan)
 	go fromASCIIToTime(expChan, string([]byte(refresh)[:4]))
-	if refresh[4:len(refresh)-6] != refreshBody {
-		return errors.New("invalid refresh body")
+
+	refreshIndex := -1
+	for i, refreshBody := range refreshBodies {
+		if refreshBody == refresh[4:len(refresh)-6] {
+			refreshIndex = i
+		}
 	}
-	if access[len(access)-6:] != refresh[len(refresh)-6:] {
-		return errors.New("refresh does't relate to access")
+	if refreshIndex < 0 {
+		return -1, errors.New("refresh body does't valid")
 	}
+
 	if time.Now().After(<-expChan) {
-		return errors.New("refresh is expired")
+		return refreshIndex, errors.New("refresh is expired")
 	}
-	return nil
+
+	if access[len(access)-6:] != refresh[len(refresh)-6:] {
+		return -1, errors.New("refresh does't relate to access")
+	}
+	return refreshIndex, nil
 }

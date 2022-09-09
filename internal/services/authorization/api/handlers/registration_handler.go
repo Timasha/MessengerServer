@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v4"
 )
 
 func RegistrationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
@@ -43,7 +42,7 @@ func RegistrationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 
 		_, getUserErr := database.GetUser(req.Login)
 
-		if getUserErr != pgx.ErrNoRows && getUserErr != nil {
+		if getUserErr != database.ErrNoRows && getUserErr != nil {
 			resp.Err = "internal database error"
 			webUtils.WriteResponse(resp, 500, c)
 			return nil

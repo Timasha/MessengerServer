@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v4"
 )
 
 func AuthorizationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
@@ -55,7 +54,7 @@ func AuthorizationHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error 
 
 		dbUser, getUserErr = database.GetUser(req.Login)
 
-		if getUserErr == pgx.ErrNoRows { // Проверка на наличие пользователя
+		if getUserErr == database.ErrNoRows { // Проверка на наличие пользователя
 			resp.Err = "user not found"
 			webUtils.WriteResponse(resp, 400, c)
 			return nil

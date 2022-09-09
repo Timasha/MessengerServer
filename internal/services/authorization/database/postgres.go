@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -78,6 +79,9 @@ func (db DB) Migrate(pathKey string) error {
 func (db DB) GetUser(login string) (User, error) {
 	var user User
 	err := db.Conn.QueryRow(context.Background(), "SELECT * FROM users WHERE login=$1", login).Scan(&user.Login, &user.Password, &user.RefreshBodies)
+	if err.Error() == pgx.ErrNoRows.Error() {
+		return user, ErrNoRows
+	}
 	return user, err
 }
 

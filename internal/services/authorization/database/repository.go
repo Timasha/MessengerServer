@@ -1,5 +1,7 @@
 package database
 
+import "errors"
+
 type Repository interface {
 	Close()
 	Migrate(string) error
@@ -8,6 +10,8 @@ type Repository interface {
 	UpdateUser(string, User) (int64, error)
 	AddRefreshBody(string, string) (int64, error)
 }
+
+var ErrNoRows error = errors.New("no object or row found")
 
 var impl Repository
 

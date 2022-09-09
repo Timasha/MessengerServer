@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v4"
 )
 
 func RefreshHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
@@ -50,8 +49,9 @@ func RefreshHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 			webUtils.WriteResponse(resp, 400, c)
 			return nil
 		}
+
 		dbUser, getUserErr := database.GetUser(tokenLogin)
-		if getUserErr == pgx.ErrNoRows {
+		if getUserErr == database.ErrNoRows {
 			resp.Err = "user " + tokenLogin + " not exist"
 			webUtils.WriteResponse(resp, 400, c)
 			return nil
@@ -60,14 +60,22 @@ func RefreshHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 			webUtils.WriteResponse(resp, 500, c)
 			return nil
 		}
-		refreshIndex := -1
-		for i, refreshBody := range dbUser.RefreshBodies {
-			if refreshBody == req.RefreshToken[4:len(req.RefreshToken)-6] {
-				refreshIndex = i
+
+		refreshIndex, validErr := token.ValidRefreshToken(req.RefreshToken, req.AccessToken, dbUser.RefreshBodies)
+
+		if validErr.Error() == "refresh is expired" {
+			_, updateErr := database.UpdateUser(dbUser.Login, database.User{RefreshBodies: append(dbUser.RefreshBodies[:refreshIndex], dbUser.RefreshBodies[:refreshIndex+1]...)})
+			if updateErr != nil {
+				resp.Err = "internal database error"
+				webUtils.WriteResponse(resp, 500, c)
+				return nil
 			}
+			resp.Err = validErr.Error()
+			webUtils.WriteResponse(resp, 400, c)
+			return nil
 		}
-		if refreshIndex < 0 {
-			resp.Err = "refresh not valid"
+		if validErr != nil {
+			resp.Err = "refresh not valid: " + validErr.Error()
 			webUtils.WriteResponse(resp, 400, c)
 			return nil
 		}
@@ -79,25 +87,16 @@ func RefreshHandler(conf config.AuthServiceConfig) func(*fiber.Ctx) error {
 		}
 		refresh, refreshGenErr := token.GenerateRefreshToken(access, conf.RefreshLifetime)
 		if refreshGenErr != nil {
-
 			resp.Err = "refresh token generation internal error"
 			webUtils.WriteResponse(resp, 500, c)
 			return nil
 		}
-		if refreshIndex == (len(dbUser.RefreshBodies) - 1) {
-			_, updateErr := database.UpdateUser(dbUser.Login, database.User{RefreshBodies: append(dbUser.RefreshBodies[:refreshIndex], refresh[4:len(refresh)-6])})
-			if updateErr != nil {
-				resp.Err = "internal database error"
-				webUtils.WriteResponse(resp, 500, c)
-				return nil
-			}
-		} else {
-			_, updateErr := database.UpdateUser(dbUser.Login, database.User{RefreshBodies: append(dbUser.RefreshBodies[:refreshIndex], append(dbUser.RefreshBodies[refreshIndex+1:], refresh[4:len(refresh)-6])...)})
-			if updateErr != nil {
-				resp.Err = "internal database error"
-				webUtils.WriteResponse(resp, 500, c)
-				return nil
-			}
+		dbUser.RefreshBodies[refreshIndex] = refresh[4 : len(refresh)-6]
+		_, updateErr := database.UpdateUser(dbUser.Login, database.User{RefreshBodies: dbUser.RefreshBodies})
+		if updateErr != nil {
+			resp.Err = "internal database error"
+			webUtils.WriteResponse(resp, 500, c)
+			return nil
 		}
 		resp.AccessToken = access
 		resp.RefreshToken = refresh
