@@ -1,0 +1,8 @@
+{
+    "domain":"",
+    "ip":"0.0.0.0",
+    "serverPort":"8080",
+    "jwtKey":"",
+    "dbUser":"",
+    "dbUserPassword":""
+}
